@@ -6,8 +6,10 @@ USE Northwind;
 	RequiredDate de la tabla orders.
 */
 
-SELECT OrderID, OrderDate, RequiredDate, DATEDIFF(day,OrderDate,RequiredDate) "Diferencia de Dias"
+SELECT DATEDIFF(day,OrderDate,RequiredDate) "Diferencia de Dias"
 FROM Orders;
+
+--SELECT OrderID, OrderDate, RequiredDate, DATEDIFF(day,OrderDate,RequiredDate) "Diferencia de Dias" FROM Orders;
 
 -- Query 2
 /*
@@ -26,6 +28,8 @@ FROM Orders;
 SELECT companyName
 FROM Customers
 WHERE City != Country AND Country != 'Mexico';
+
+--SELECT companyName, City, Country FROM Customers WHERE City != Country AND Country != 'Mexico';
 
 -- Query 4
 /*
@@ -57,11 +61,15 @@ HAVING COUNT(OrderID) IN(5,6,7,8,9,10);
 	mostrar solo las del año 1998, utilice el operador LIKE y la funcion YEAR.
 */
 
-SELECT CustomerID, OrderID, OrderDate, YEAR(OrderDate) "Year"
+SELECT CustomerID, OrderDate
 FROM Orders
 WHERE YEAR(OrderDate) LIKE '%1998%';
 
+--SELECT CustomerID, OrderID, OrderDate, YEAR(OrderDate) "Year" FROM Orders WHERE YEAR(OrderDate) LIKE '%1998%';
 
-SELECT CustomerID, OrderID, OrderDate, YEAR(OrderDate) "Year"
+
+SELECT CustomerID,OrderDate
 FROM Orders
 WHERE YEAR(OrderDate) = 1998;
+
+--SELECT CustomerID, OrderID, OrderDate, YEAR(OrderDate) "Year" FROM Orders WHERE YEAR(OrderDate) = 1998;
