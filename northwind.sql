@@ -1,3 +1,6 @@
+CREATE DATABASE Northwind;
+GO
+
 USE [Northwind]
 GO
 /****** Object:  Table [dbo].[CustomerDemographics]    Script Date: 08/12/2011 11:46:03 ******/

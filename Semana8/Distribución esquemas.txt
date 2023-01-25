@@ -1,0 +1,33 @@
+
+
+----------Schema Nurse---------------
+----------Tables Name----------------
+
+EXPEDIENTE
+ENFERMEDADES
+Medicamentos
+Farmaceutica
+
+----------Schema Doctor---------------
+----------Tables Name-----------------
+
+RECETA
+DIAGNOSTICO
+
+----------Schema Secretary---------------
+----------Tables Name--------------------
+
+CITAS MEDICAS
+PACIENTES
+TELEFONO PACIENTES
+DIRECCION PACIENTES
+Municipios
+Departamentos
+
+DOCTOR
+DIRECCION DOCTOR
+Especialidad
+TELEFONO DOCTOR
+ENFERMERA
+DIRECCION ENFERMERA
+TELEFONO ENFERMERA

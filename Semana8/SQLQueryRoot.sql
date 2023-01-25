@@ -3,10 +3,12 @@
 -- Create Data Base: Clinic;
 
 CREATE DATABASE Clinic;
+GO
 
 -- Use DataBase
 
 USE Clinic;
+GO
 
 
 -- ! ------------------------------------------------------------------------
@@ -14,13 +16,9 @@ USE Clinic;
 
 -- ! Create Schemas
 
--- Create Schemas for Students
+-- Create Schemas
 
-CREATE SCHEMA CesarSchema;
 
-CREATE SCHEMA YosselinSchema;
-
-CREATE SCHEMA RicardoSchema;
 
 
 -- ! ------------------------------------------------------------------------
@@ -30,11 +28,6 @@ CREATE SCHEMA RicardoSchema;
 
 -- Create Logins for Users
 
-CREATE LOGIN CesarLogin WITH PASSWORD = 'CesarPassword';
-
-CREATE LOGIN YosselinLogin WITH PASSWORD = 'YosselinPassword';
-
-CREATE LOGIN RicardoLogin WITH PASSWORD = 'RicardoPassword';
 
 
 -- ! ------------------------------------------------------------------------
@@ -44,11 +37,6 @@ CREATE LOGIN RicardoLogin WITH PASSWORD = 'RicardoPassword';
 
 -- Create Users for Students
 
-CREATE USER CesarUser FOR LOGIN CesarLogin WITH DEFAULT_SCHEMA = CesarSchema;
-
-CREATE USER YosselinUser FOR LOGIN YosselinLogin WITH DEFAULT_SCHEMA = YosselinSchema;
-
-CREATE USER RicardoUser FOR LOGIN RicardoLogin WITH DEFAULT_SCHEMA = RicardoSchema;
 
 
 -- ! ------------------------------------------------------------------------
@@ -56,23 +44,8 @@ CREATE USER RicardoUser FOR LOGIN RicardoLogin WITH DEFAULT_SCHEMA = RicardoSche
 
 -- * DCL
 
--- ! Create Grant Permissions for Users.
+-- ! Create Grant Permissions.
 
--- All Grants on Schema for User
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::CesarSchema TO CesarUser;
-
-
--- ! Grants for User on Schemas
-
-GRANT SELECT ON SCHEMA::YosselinSchema TO YosselinUser;
-
-GRANT INSERT ON SCHEMA::YosselinSchema TO YosselinUser;
-
-GRANT UPDATE ON SCHEMA::YosselinSchema TO YosselinUser;
-
-
-GRANT INSERT ON SCHEMA::RicardoSchema TO RicardoUser;
 
 -- ! ------------------------------------------------------------------------
 
@@ -81,163 +54,211 @@ GRANT INSERT ON SCHEMA::RicardoSchema TO RicardoUser;
 
 -- ! Table Doctores
 
-CREATE TABLE CesarSchema.Doctores (
+CREATE TABLE SchemaSecretary.Doctores (
     idDoctor INT IDENTITY(1,1) PRIMARY KEY,
     nombre VARCHAR(30) NOT NULL,
     apellido VARCHAR(30) NOT NULL,
-    genero VARCHAR(10) NOT NULL,
-    edad INT NOT NULL,
+    genero VARCHAR(1) NOT NULL CHECK (genero = 'M' OR genero = 'F'),
+    edad INT NOT NULL CHECK (edad > 0),
+
+	
+    -- Foreign Key: idEspecialidad
+    fk_idEspecialidad INT NOT NULL,
 );
+GO
 
 -- ! Table Enfermeras
 
-CREATE TABLE CesarSchema.Enfermeras (
+CREATE TABLE SchemaSecretary.Enfermeras (
     idEnfermera INT IDENTITY(1,1) PRIMARY KEY,
     nombre VARCHAR(30) NOT NULL,
     apellido VARCHAR(30) NOT NULL,
-    genero VARCHAR(10) NOT NULL,
-    edad INT NOT NULL,
+    genero VARCHAR(1) NOT NULL CHECK (genero = 'M' OR genero = 'F'),
+    edad INT NOT NULL CHECK (edad > 0),
 );
+GO
 
 -- ! Table Departamentos
 
-CREATE TABLE RicardoSchema.Departamentos (
+CREATE TABLE SchemaSecretary.Departamentos (
     idDepartamento INT IDENTITY(1,1) PRIMARY KEY, 
     nombreDepartamento VARCHAR(50) NOT NULL,
-    descripcionDepartamento VARCHAR(50) NOT NULL,
+    descripcionDepartamento VARCHAR(60) NOT NULL,
 );
+GO
+
+-- ! Table Municipios
+
+CREATE TABLE SchemaSecretary.Municipios (
+    idMunicipio INT IDENTITY(1,1) PRIMARY KEY, 
+    nombreMunicipio VARCHAR(50) NOT NULL,
+    descripcionMunicipo VARCHAR(60) NOT NULL,
+
+	-- Foreign Key: idDepartamento
+    fk_idDepartamento INT NOT NULL,
+);
+GO
 
 -- ! Table Expedientes
 
-CREATE TABLE CesarSchema.Expedientes (
+CREATE TABLE SchemaNurse.Expedientes (
     idExpediente INT IDENTITY(1,1) PRIMARY KEY,
+	numeroExpediente VARCHAR(10) NOT NULL,
+	fechaExpediente DATE NOT NULL,
     descripcionExpediente VARCHAR(100) NOT NULL,
 
     -- Foreign Key: idPaciente
     fk_idPaciente INT NOT NULL,
 
 );
+GO
 
 -- ! Table Pacientes
 
-CREATE TABLE CesarSchema.Pacientes (
+CREATE TABLE SchemaSecretary.Pacientes (
     idPaciente INT IDENTITY(1,1) PRIMARY KEY,
     nombre VARCHAR(30) NOT NULL,
     apellido VARCHAR(30) NOT NULL,
-    genero VARCHAR(10) NOT NULL,
-    edad INT NOT NULL,
+    genero VARCHAR(1) NOT NULL CHECK (genero = 'M' OR genero = 'F'),
+    edad INT NOT NULL CHECK (edad > 0),
 );
+GO
 
--- ! Table Telefonos
-
-CREATE TABLE CesarSchema.Telefonos (
-    idTelefono INT IDENTITY(1,1) PRIMARY KEY, 
-    telefono VARCHAR(15) NOT NULL,
-    descripcion VARCHAR(50) NOT NULL,
-
-    -- Foreign Key: idDoctor, idEnfermera, idPaciente
-    fk_idDoctor INT, --NOT NULL
-    fk_idEnfermera INT, --NOT NULL
-	fk_idPaciente INT, --NOT NULL
-
-);
 
 -- ! Table Especialidades
 
-CREATE TABLE YosselinSchema.Especialidades (
+CREATE TABLE SchemaSecretary.Especialidades (
     idEspecialidad INT IDENTITY(1,1) PRIMARY KEY,
     nombreEspecialidad VARCHAR(50) NOT NULL,
     descripcion VARCHAR(50) NOT NULL,
-
-    -- Foreign Key: idDoctor
-    fk_idDoctor INT NOT NULL,
 );
+GO
 
 -- ! Table Citas_Medicas
 
-CREATE TABLE YosselinSchema.Citas_Medicas (
+CREATE TABLE SchemaSecretary.Citas_Medicas (
     idCitaMedica INT IDENTITY(1,1) PRIMARY KEY,
-    fecha VARCHAR(50) NOT NULL,
+    fecha DATE NOT NULL,
     precio FLOAT(2) NOT NULL,
 
     -- Foreign Key: idDoctor, idEnfermera, idExpedinete
-	fk_idDoctor INT, --NOT NULL
-    fk_idEnfermera INT, --NOT NULL
-	fk_idExpediente INT, --NOT NULL
+	fk_idDoctor INT NOT NULL,
+    fk_idEnfermera INT NOT NULL,
+	fk_idExpediente INT NOT NULL,
+	fk_idDiagnostico INT NOT NULL,
 );
+GO
 
 -- ! Table Diagnosticos
 
-CREATE TABLE YosselinSchema.Diagnosticos (
+CREATE TABLE SchemaDoctor.Diagnosticos (
     idDiagnostico INT IDENTITY(1,1) PRIMARY KEY,
-    descripcionDiagnostico VARCHAR(100) NOT NULL,
-
-    -- Foreign Key: idCitaMedica
-    fk_idCitaMedica INT NOT NULL,
+	sintomas VARCHAR(100) NOT NULL,
+	signos_vitales VARCHAR(100) NOT NULL,
 
 );
+GO
 
 -- ! Table Recetas
 
-CREATE TABLE YosselinSchema.Recetas (
+CREATE TABLE SchemaDoctor.Recetas (
     idReceta INT IDENTITY(1,1) PRIMARY KEY,
+	dosis VARCHAR(100) NOT NULL,
     descripcionReceta VARCHAR(100) NOT NULL,
 
     -- Foreign Key: idDiagnostico
-    fk_idDiagnostico INT NOT NULL,
+    fk_idMedicamento INT NOT NULL,
+	fk_idDiagnostico INT NOT NULL,
 
 );
+GO
 
--- ! Table Detalles_Recetas
+-- ! Table Farmaceutica
 
-CREATE TABLE YosselinSchema.Detalles_Recetas (
-    idDetalleReceta INT IDENTITY(1,1) PRIMARY KEY,
-    descripcionDetalleReceta VARCHAR(100) NOT NULL,
-
-    -- Foreign Key: idReceta
-    fk_idReceta INT NOT NULL,
+CREATE TABLE SchemaNurse.Farmaceuticas(
+	idFarmaceutica INT IDENTITY(1,1) PRIMARY KEY,
+	nombre VARCHAR(50) NOT NULL,
+	descripcion VARCHAR(100) NOT NULL,
 );
 
 -- ! Table Medicamentos
 
-CREATE TABLE YosselinSchema.Medicamentos (
+CREATE TABLE SchemaNurse.Medicamentos (
     idMedicamento INT IDENTITY(1,1) PRIMARY KEY,
-    nombreMedicamento VARCHAR(30) NOT NULL,
-    dosisAsignada VARCHAR(50) NOT NULL,
+    nombreMedicamento VARCHAR(50) NOT NULL,
     fechaCaducidad VARCHAR(50) NOT NULL,
     indicacionesMedicamento VARCHAR(100) NOT NULL,
     
 	-- Foreign Key: idDetalleReceta
-    fk_idDetalleReceta INT NOT NULL,
+    fk_idFarmaceutica INT NOT NULL,
 
 );
+GO
 
--- ! Table Municipios
+CREATE TABLE SchemaSecretary.Direccion_Paciente(
+    idDireccion INT IDENTITY (1,1) PRIMARY KEY,
+    calle VARCHAR(50),
+    ciudad VARCHAR(50),
+    numeroCasa VARCHAR(5),
 
-CREATE TABLE RicardoSchema.Municipios (
-    idMunicipio INT IDENTITY(1,1) PRIMARY KEY, 
-    nombreMunicipio VARCHAR(30) NOT NULL,
-    descripcionMunicipo VARCHAR(50) NOT NULL,
+    -- Foreign Key: idMunicipio
+    fk_idMunicipio INT NOT NULL,
+    fk_idPaciente INT NOT NULL,
+);
+GO
 
-	-- Foreign Key: idDepartamento
-    fk_idDepartamento INT NOT NULL,
+CREATE TABLE SchemaSecretary.Telefono_Paciente(
+    idTelefono INT IDENTITY (1,1) PRIMARY KEY,
+    telefono VARCHAR (15),
+    descripcion VARCHAR (20),
 
+    -- Foreign Key: idPaciente
+    fk_idPaciente INT NOT NULL,
+);
+GO
+
+CREATE TABLE SchemaSecretary.Direccion_Doctor (
+    idDireccion INT IDENTITY (1,1) PRIMARY KEY,
+    Calle VARCHAR (30),
+    Cuidad VARCHAR (30),
+    Numero_Casa VARCHAR(5),
+
+    -- Foreign Key: idMunicipio
+    fk_idMunicipio INT NOT NULL,
+    fk_idDoctor INT NOT NULL,
 );
 
--- ! Table Direcciones
+CREATE TABLE SchemaSecretary.Telefono_Doctor (
+    idTelefono INT IDENTITY (1,1) PRIMARY KEY,
+    telefono VARCHAR (15),
+    descripcion VARCHAR (20),
 
-CREATE TABLE YosselinSchema.Direcciones (
-    idDireccion INT IDENTITY(1,1) PRIMARY KEY,
-    calle VARCHAR(35) NOT NULL,
-    ciudad VARCHAR(20) NOT NULL,
-    
-	-- Foreign Key: idPaciente, idDoctor, idEnfermera, idMunicipio
-    fk_idPaciente INT,  --NOT NULL
-    fk_idDoctor INT,  --NOT NULL
-	fk_idEnfermera INT,  --NOT NULL
-    fk_idMunicipio INT,  --NOT NULL
-
+    -- Foreign Key: idDoctor
+    fk_idDoctor INT NOT NULL,
 );
+GO
+
+CREATE TABLE SchemaSecretary.Direccion_Enfermera (
+    idDireccion INT IDENTITY (1,1) PRIMARY KEY,
+    calle VARCHAR (30),
+    cuidad VARCHAR (30),
+    numeroCasa VARCHAR(5),
+
+    -- Foreign Key: idMunicipio
+    fk_idMunicipio INT NOT NULL,
+    fk_idEnfermera INT NOT NULL,
+);
+GO
+
+CREATE TABLE SchemaSecretary.Telefono_Enfermera (
+    idTelefono INT IDENTITY (1,1) PRIMARY KEY,
+    telefono VARCHAR (15),
+    descripcion VARCHAR (20),
+
+    -- Foreign Key: idEnfermera
+    fk_idEnfermera INT NOT NULL,
+);
+GO
 
 -- ! ------------------------------------------------------------------------
 
@@ -246,104 +267,108 @@ CREATE TABLE YosselinSchema.Direcciones (
 
 -- ! Alter Tables
 
+--! Table Direccion_Doctor
+-- * Add Foreign Key: idMunicipio
+ALTER TABLE SchemaSecretary.Direccion_Doctor
+ADD FOREIGN KEY (fk_idMunicipio) REFERENCES SchemaSecretary.Municipios(idMunicipio)
+GO
+
+-- * Add Foreign Key: idDoctor
+ALTER TABLE SchemaSecretary.Direccion_Doctor
+ADD FOREIGN KEY (fk_idDoctor) REFERENCES SchemaSecretary.Doctor(idDoctor)
+GO
+
+--! Table Telefono_Doctor
+-- * Add Foreign Key: idDoctor
+ALTER TABLE SchemaSecretary.Telefono_Doctor
+ADD FOREIGN KEY (fk_idDoctor) REFERENCES SchemaSecretary.Doctor(idDoctor)
+GO
+
+--! Table Direccion_Paciente
+
+-- * Add Foreign Key: idPaciente
+ALTER TABLE SchemaSecretary.Direccion_Paciente
+ADD FOREIGN KEY (fk_idPaciente) REFERENCES SchemaSecretary.Paciente(idPaciente)
+GO
+
+-- * Add Foreign Key: idMunicipio
+ALTER TABLE SchemaSecretary.Direccion_Paciente
+ADD FOREIGN KEY (fk_idMunicipio) REFERENCES SchemaSecretary.Municipios(idMunicipio)
+GO
+
+--! Table Telefono_Paciente
+
+-- * Add Foreign Key: idPaciente
+ALTER TABLE SchemaSecretary.Telefono_Paciente
+ADD FOREIGN KEY (fk_idPaciente) REFERENCES SchemaSecretary.Paciente(idPaciente)
+GO
+
+--! Table Direccion_Enfermera
+
+--* Add Foreign Key: idEnfermera
+ALTER TABLE SchemaSecretary.Direccion_Enfermera
+ADD FOREIGN KEY (fk_idEnfermera) REFERENCES SchemaSecretary.Enfermera(idEnfermera)
+GO
+
+-- * Add Foreign Key: idMunicipio
+ALTER TABLE SchemaSecretary.Direccion_Enfermera
+ADD FOREIGN KEY (fk_idMunicipio) REFERENCES SchemaSecretary.Municipios(idMunicipio)
+GO
+
+--! Table Telefono_Enfermera
+
+-- * Add Foreign Key: idEnfermera
+ALTER TABLE SchemaSecretary.Telefono_Enfermera
+ADD FOREIGN KEY (fk_idEnfermera) REFERENCES SchemaSecretary.Enfermera(idEnfermera)
+GO
+
 
 -- ! Table Expedientes
 -- * Add Foreign Key: idPaciente
-ALTER TABLE CesarSchema.Expedientes
-ADD FOREIGN KEY(fk_idPaciente) REFERENCES CesarSchema.Pacientes(idPaciente);
-
-
--- ! Table Telefonos
--- * Add Foreign Key: idDoctor
-ALTER TABLE CesarSchema.Telefonos
-ADD FOREIGN KEY(fk_idDoctor) REFERENCES CesarSchema.Doctores(idDoctor);
-
--- * Add Foreign Key: idEnfermera
-ALTER TABLE CesarSchema.Telefonos
-ADD FOREIGN KEY(fk_idEnfermera) REFERENCES CesarSchema.Enfermeras(idEnfermera);
-
--- * Add Foreign Key: idPaciente
-ALTER TABLE CesarSchema.Telefonos
-ADD FOREIGN KEY(fk_idPaciente) REFERENCES CesarSchema.Pacientes(idPaciente);
-
+ALTER TABLE SchemaNurse.Expedientes
+ADD FOREIGN KEY(fk_idPaciente) REFERENCES SchemaSecretary.Pacientes(idPaciente);
+GO
 
 -- ! Table Especialidades
 -- * Add Foreign Key: idDoctor
-ALTER TABLE YosselinSchema.Especialidades
-ADD FOREIGN KEY(fk_idDoctor) REFERENCES CesarSchema.Doctores(idDoctor);
+ALTER TABLE SchemaSecretary.Especialidades
+ADD FOREIGN KEY(fk_idDoctor) REFERENCES SchemaSecretary.Doctor(idDoctor);
+GO
 
 
 -- ! Table Citas_Medicas
 -- * Add Foreign Key: idDoctor
-ALTER TABLE YosselinSchema.Citas_Medicas
-ADD FOREIGN KEY(fk_idDoctor) REFERENCES CesarSchema.Doctores(idDoctor);
+ALTER TABLE SchemaSecretary.Citas_Medicas
+ADD FOREIGN KEY(fk_idDoctor) REFERENCES SchemaSecretary.Doctor(idDoctor);
+GO
     
 -- * Add Foreign Key: idEnfermera
-ALTER TABLE YosselinSchema.Citas_Medicas
-ADD FOREIGN KEY(fk_idEnfermera) REFERENCES CesarSchema.Enfermeras(idEnfermera);
+ALTER TABLE SchemaSecretary.Citas_Medicas
+ADD FOREIGN KEY(fk_idEnfermera) REFERENCES SchemaSecretary.Enfermeras(idEnfermera);
+GO
     
 -- * Add Foreign Key: idExpediente
-ALTER TABLE YosselinSchema.Citas_Medicas
-ADD FOREIGN KEY(fk_idExpediente) REFERENCES CesarSchema.Expedientes(idExpediente);
+ALTER TABLE SchemaSecretary.Citas_Medicas
+ADD FOREIGN KEY(fk_idExpediente) REFERENCES SchemaNurse.Expedientes(idExpediente);
+GO
 
-
--- ! Table Diagnosticos
--- * Add Foreign Key: idCitaMedica
-ALTER TABLE YosselinSchema.Diagnosticos
-ADD FOREIGN KEY(fk_idCitaMedica) REFERENCES YosselinSchema.Citas_Medicas(idCitaMedica);
+-- * Add Foreign Key: idDiagnostico
+ALTER TABLE SchemaSecretary.Citas_Medicas
+ADD FOREIGN KEY(fk_idDiagnostico) REFERENCES SchemaDoctor.Diagnosticos(idDiagnostico);
+GO
 
 
 -- ! Table Recetas
 -- * Add Foreign Key: idDiagnostico
-ALTER TABLE YosselinSchema.Recetas
-ADD FOREIGN KEY(fk_idDiagnostico) REFERENCES YosselinSchema.Diagnosticos(idDiagnostico);
-
-
--- ! Table Detalles_Recetas
--- * Add Foreign Key: idReceta
-ALTER TABLE YosselinSchema.Detalles_Recetas
-ADD FOREIGN KEY(fk_idReceta) REFERENCES YosselinSchema.Recetas(idReceta);
-
-
--- ! Table Medicamentos
--- * Add Foreign Key: idDetalleReceta
-ALTER TABLE YosselinSchema.Medicamentos
-ADD FOREIGN KEY(fk_idDetalleReceta) REFERENCES YosselinSchema.Detalles_Recetas(idDetalleReceta);
-
+ALTER TABLE SchemaDoctor.Recetas
+ADD FOREIGN KEY(fk_idDiagnostico) REFERENCES SchemaDoctor.Diagnosticos(idDiagnostico);
+GO
 
 -- ! Table Municipios
 -- * Add Foreign Key: idDepartamento
-ALTER TABLE RicardoSchema.Municipios
-ADD FOREIGN KEY(fk_idDepartamento) REFERENCES RicardoSchema.Departamentos(idDepartamento);
-
-
--- ! Table Direcciones
--- * Add Foreign Key: idPaciente
-ALTER TABLE YosselinSchema.Direcciones
-ADD FOREIGN KEY(fk_idPaciente) REFERENCES CesarSchema.Pacientes(idPaciente);
-
--- * Add Foreign Key: idDoctor
-ALTER TABLE YosselinSchema.Direcciones
-ADD FOREIGN KEY(fk_idDoctor) REFERENCES CesarSchema.Doctores(idDoctor);
-
--- * Add Foreign Key: idEnfermera
-ALTER TABLE YosselinSchema.Direcciones
-ADD FOREIGN KEY(fk_idEnfermera) REFERENCES CesarSchema.Enfermeras(idEnfermera);
-
--- * Add Foreign Key: idMunicipio
-ALTER TABLE YosselinSchema.Direcciones
-ADD FOREIGN KEY(fk_idMunicipio) REFERENCES RicardoSchema.Municipios(idMunicipio);
+ALTER TABLE SchemaSecretary.Municipios
+ADD FOREIGN KEY(fk_idDepartamento) REFERENCES SchemaSecretary.Departamentos(idDepartamento);
+GO
 
 
 -- ! ------------------------------------------------------------------------
-
-
--- * DCL
-
--- ! Grants especific in Tables on Schemas for Users
-
-GRANT SELECT ON OBJECT::RicardoSchema.Departamentos TO RicardoUser;
-
-GRANT SELECT ON OBJECT::RicardoSchema.Municipios TO RicardoUser;
-
-GRANT SELECT ON OBJECT::YosselinSchema.Direcciones TO RicardoUser;
